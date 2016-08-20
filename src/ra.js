@@ -17,7 +17,7 @@ module.exports = class RA {
     static getParties() {
         return new Promise((resolve, reject) => {
             request({
-                url: BASE_URL + '/events.aspx?ai=13&v=day&mn=8&yr=2016&dy=19'
+                url: BASE_URL + '/events.aspx?ai=13&v=day&mn=8&yr=2016&dy=20'
             }, (err, response, body) => {
                 if (err) return reject(err);
 
@@ -69,9 +69,9 @@ module.exports = class RA {
                 let priceTagHTML = $('#tickets li.onsale label p')
                     .html();
 
-                let priceTag = /^<span>.+<\/span>(.+)$/
-                    .exec(priceTagHTML)
-                    [1];
+                let priceTag = !priceTagHTML ? 'Sold out' :
+                    /^<span>.+<\/span>(.+)$/
+                    .exec(priceTagHTML)[1];
 
                 let details = $('#event-detail');
 
@@ -100,9 +100,12 @@ module.exports = class RA {
                     })
                     .get();
 
-                return resolve({
-                    name, price, priceTag, detail, artists
-                });
+                party.price = price;
+                party.priceTag = priceTag;
+                party.detail = detail;
+                party.artists = artists;
+
+                return resolve(party);
             });
         });
     }
